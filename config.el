@@ -20,6 +20,9 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
+(add-to-list 'org-structure-template-alist
+		  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (when window-system (global-hl-line-mode t))
@@ -165,3 +168,8 @@
   (dashboard-setup-startup-hook)
   (setq dashboard-items '((recents . 10)))
   (setq dashboard-banner-logo-title "Assalamualaikum!"))
+
+(use-package company
+  :ensure t
+  :init
+  (add-hook 'after-init-hook 'global-company-mode))
