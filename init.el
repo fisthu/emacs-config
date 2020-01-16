@@ -13,6 +13,10 @@
   (package-refresh-contents)
   (package-install 'spacemacs-theme))
 ;;;;;
+(defconst IS-MAC (eq system-type 'darwin))
+(when IS-MAC
+  (setq mac-command-modifier 'super)
+  (setq mac-option-modifier 'meta))
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 

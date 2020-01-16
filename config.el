@@ -193,7 +193,7 @@
 (use-package dmenu
   :ensure t
   :bind
-  ("M-n" . 'dmenu))
+  ("s-n" . 'dmenu))
 
 (use-package symon
   :ensure t

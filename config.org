@@ -297,5 +297,5 @@ so you can just type *<el* then hit TAB
   (use-package symon
     :ensure t
     :bind
-    ("M-h" . symon-mode))
+    ("s-y" . symon-mode))
 #+END_SRC
