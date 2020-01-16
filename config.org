@@ -285,3 +285,17 @@ so you can just type *<el* then hit TAB
     (diminish 'rainbow-mode)
     (diminish 'which-key-mode))
 #+END_SRC
+* dmenu
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind
+    ("s-n" . 'dmenu))
+#+END_SRC
+* symon
+#+BEGIN_SRC emacs-lisp
+  (use-package symon
+    :ensure t
+    :bind
+    ("M-h" . symon-mode))
+#+END_SRC

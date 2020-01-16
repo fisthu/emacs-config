@@ -189,3 +189,13 @@
   (diminish 'subword-mode)
   (diminish 'rainbow-mode)
   (diminish 'which-key-mode))
+
+(use-package dmenu
+  :ensure t
+  :bind
+  ("M-n" . 'dmenu))
+
+(use-package symon
+  :ensure t
+  :bind
+  ("M-h" . symon-mode))
