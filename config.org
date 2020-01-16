@@ -1,3 +1,11 @@
+* Theme
+** zerodark
+#+BEGIN_SRC emacs-lisp
+  (use-package zerodark-theme
+    :ensure t
+    :init
+    (load-theme 'zerodark t))
+#+END_SRC
 * Terminal
 ** Setting default shell to zsh
 #+BEGIN_SRC emacs-lisp
@@ -84,7 +92,7 @@ so you can just type *<el* then hit TAB
 #+END_SRC
 ** disable backup file and auto save
 #+BEGIN_SRC emacs-lisp
-(setq make-backup-file nil)
+(setq make-backup-files nil)
 (setq auto-save-default nil)
 #+END_SRC
 ** electric pair
@@ -105,6 +113,14 @@ so you can just type *<el* then hit TAB
 #+BEGIN_SRC emacs-lisp
   (setq display-time-24hr-format t)
   (display-time-mode 1)
+#+END_SRC
+** Set UTF-8 Encoding
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
 #+END_SRC
 * IDO
 ** enable ido mode
@@ -224,16 +240,8 @@ so you can just type *<el* then hit TAB
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
-* convenient function
-** kill-whole-word
-#+BEGIN_SRC emacs-lisp
-  (defun kill-whole-word ()
-    (interactive)
-    (backward-word)
-    (kill-word 1))
-  (global-set-key (kbd "C-c w w") 'kill-whole-word)
-#+END_SRC
-** copy-whole-line
+* Text manipulation
+** copy-a-line
 #+BEGIN_SRC emacs-lisp
   (defun copy-whole-line ()
     (interactive)
@@ -243,6 +251,16 @@ so you can just type *<el* then hit TAB
 	(point-at-bol)
 	(point-at-eol)))))
   (global-set-key (kbd "C-c w l") 'copy-whole-line)
+#+END_SRC
+** kill-inner-word
+#+BEGIN_SRC emacs-lisp
+  (defun fisthu/kill-inner-word ()
+    "Kills the entire word where the current cursor is in. Equivalent to 'ciw' in vim."
+    (interactive)
+    (forward-char 1)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c w k") 'fisthu/kill-inner-word)
 #+END_SRC
 * hungry-delete
 #+BEGIN_SRC emacs-lisp
@@ -292,7 +310,7 @@ so you can just type *<el* then hit TAB
   (use-package dmenu
     :ensure t
     :bind
-    ("s-n" . 'dmenu))
+    ("s-m" . 'dmenu))
 #+END_SRC
 * symon
 #+BEGIN_SRC emacs-lisp

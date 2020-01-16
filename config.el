@@ -1,3 +1,8 @@
+(use-package zerodark-theme
+  :ensure t
+  :init
+  (load-theme 'zerodark t))
+
 (defvar my-term-shell "/bin/zsh")
 (defadvice ansi-term (before force-bash)
   (interactive (list my-term-shell)))
@@ -43,7 +48,7 @@
 
 (global-subword-mode 1)
 
-(setq make-backup-file nil)
+(setq make-backup-files nil)
 (setq auto-save-default nil)
 
 (setq electric-pair-pairs '(
@@ -58,6 +63,12 @@
 
 (setq display-time-24hr-format t)
 (display-time-mode 1)
+
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
 (setq ido-enable-flex-matching nil)
 (setq ido-create-new-buffer 'always)
@@ -145,12 +156,6 @@
   (other-window 1))
 (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 
-(defun kill-whole-word ()
-  (interactive)
-  (backward-word)
-  (kill-word 1))
-(global-set-key (kbd "C-c w w") 'kill-whole-word)
-
 (defun copy-whole-line ()
   (interactive)
   (save-excursion
@@ -159,6 +164,14 @@
       (point-at-bol)
       (point-at-eol)))))
 (global-set-key (kbd "C-c w l") 'copy-whole-line)
+
+(defun fisthu/kill-inner-word ()
+  "Kills the entire word where the current cursor is in. Equivalent to 'ciw' in vim."
+  (interactive)
+  (forward-char 1)
+  (backward-word)
+  (kill-word 1))
+(global-set-key (kbd "C-c w k") 'fisthu/kill-inner-word)
 
 (use-package hungry-delete
   :ensure t
@@ -195,7 +208,7 @@
 (use-package dmenu
   :ensure t
   :bind
-  ("s-n" . 'dmenu))
+  ("s-m" . 'dmenu))
 
 (use-package symon
   :ensure t
