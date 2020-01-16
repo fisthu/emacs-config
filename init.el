@@ -52,10 +52,13 @@
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(package-selected-packages
    (quote
-    (zerodark-theme symon dmenu diminish spaceline company dashboard rainbow-delimiters hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode org-bullets beacon spacemacs-theme which-key use-package))))
+    (zerodark-theme symon dmenu diminish spaceline company dashboard rainbow-delimiters hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode org-bullets beacon spacemacs-theme which-key use-package)))
+ '(pos-tip-background-color "36473A")
+ '(pos-tip-foreground-color "FFFFC8"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "PfEd" :family "TerminusTTF")))))
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "1ASC" :family "Source Code Pro"))))
+ '(fringe ((t (:background "#292b2e")))))
