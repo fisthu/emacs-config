@@ -53,6 +53,9 @@
 (line-number-mode 1)
 (column-number-mode 1)
 
+(setq display-time-24hr-format t)
+(display-time-mode 1)
+
 (setq ido-enable-flex-matching nil)
 (setq ido-create-new-buffer 'always)
 (setq ido-everywhere t)
@@ -105,6 +108,12 @@
   :ensure t
   :init (rainbow-mode 1))
 
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ;; enable only on programming mode
+  (rainbow-delimiters-mode 1))
+
 (use-package switch-window
   :ensure t
   :config
@@ -149,3 +158,10 @@
 (use-package hungry-delete
   :ensure t
   :config (global-hungry-delete-mode))
+
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-items '((recents . 10)))
+  (setq dashboard-banner-logo-title "Assalamualaikum!"))
