@@ -146,6 +146,7 @@ so you can just type *<el* then hit TAB
 ** always kill current buffer
 #+BEGIN_SRC emacs-lisp
   (defun kill-current-buffer ()
+    "Kills the current buffer."
     (interactive)
     (kill-buffer (current-buffer)))
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
@@ -153,9 +154,10 @@ so you can just type *<el* then hit TAB
 ** kill-all-buffers
 #+BEGIN_SRC emacs-lisp
   (defun kill-all-buffers ()
+    "Kill all buffers!."
     (interactive)
     (mapc 'kill-buffer (buffer-list)))
-  (global-set-key (kbd "C-x C-a k") 'kill-all-buffers)
+  (global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
 #+END_SRC
 * avy
 #+BEGIN_SRC emacs-lisp

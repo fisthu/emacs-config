@@ -83,14 +83,16 @@
 (setq ibuffer-expert t)
 
 (defun kill-current-buffer ()
+  "Kills the current buffer."
   (interactive)
   (kill-buffer (current-buffer)))
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 
 (defun kill-all-buffers ()
+  "Kill all buffers!."
   (interactive)
   (mapc 'kill-buffer (buffer-list)))
-(global-set-key (kbd "C-x C-a k") 'kill-all-buffers)
+(global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
 
 (use-package avy
   :ensure t
@@ -198,4 +200,4 @@
 (use-package symon
   :ensure t
   :bind
-  ("M-h" . symon-mode))
+  ("s-y" . symon-mode))
