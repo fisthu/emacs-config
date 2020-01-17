@@ -227,6 +227,11 @@ so you can just type *<el* then hit TAB
 			      ))
   (electric-pair-mode t)
 #+END_SRC
+** disable electric auto indent
+#+BEGIN_SRC emacs-lisp
+  (when (fboundp 'electric-indent-mode)
+    (electric-indent-mode -1))
+#+END_SRC
 ** show lines and columns on the modeline
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
@@ -255,23 +260,23 @@ so you can just type *<el* then hit TAB
 #+END_SRC
 ** ido-vertical
 #+BEGIN_SRC emacs-lisp
-  (use-package ido-vertical-mode
-    :ensure t
-    :init
-    (ido-vertical-mode 1))
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+  ;;(use-package ido-vertical-mode
+  ;;  :ensure t
+  ;;  :init
+  ;;  (ido-vertical-mode 1))
+  ;;(setq ido-vertical-define-keys 'C-n-and-C-p-only)
 #+END_SRC
 ** smex (ido like for M-x)
 #+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :ensure t
-    :init (smex-initialize)
-    :bind
-    ("M-x" . smex))
+  ;;(use-package smex
+  ;;  :ensure t
+  ;;  :init (smex-initialize)
+  ;;  :bind
+  ;;  ("M-x" . smex))
 #+END_SRC
 ** switch buffer
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+  ;;(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 #+END_SRC
 * Buffers
 ** enable ibuffer
@@ -429,6 +434,7 @@ so you can just type *<el* then hit TAB
     :ensure t
     :config
     (when IS-MAC
+      (setq exec-path-from-shell-check-startup-files -1)
       (exec-path-from-shell-initialize)))
 #+END_SRC
 * Programming
@@ -456,7 +462,7 @@ so you can just type *<el* then hit TAB
     (lsp-auto-guess-root nil)
     (lsp-prefer-flymake nil) ; use flycheck instead
     :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-    :hook ((python-mode c-mode c++-mode java-mode) . lsp))
+    :hook ((java-mode vue-mode) . lsp))
 #+END_SRC
 ** lsp-ui
 #+BEGIN_SRC emacs-lisp
@@ -472,7 +478,7 @@ so you can just type *<el* then hit TAB
                 ([remap xref-find-references] . lsp-ui-peek-find-references)
                 ("C-c u" . lsp-ui-imenu))
     :custom
-    (lsp-ui-doc-enable t)
+    (lsp-ui-doc-enable nil) ;; set to t to activate documentation
     (lsp-ui-doc-header t)
     (lsp-ui-doc-include-signature t)
     (lsp-ui-doc-position 'top)
@@ -543,6 +549,16 @@ so you can just type *<el* then hit TAB
     :config
     (add-hook 'java-mode-hook 'lsp))
 #+END_SRC
+** vue-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package vue-mode
+    :ensure t
+    :config
+    (setq mmm-submode-decoration-level 0)
+    (add-hook 'mmm-mode-hook
+              (lambda ()
+                (set-face-background 'mmm-default-submode-face "fafafa"))))
+#+END_SRC
 * Modeline
 ** spaceline
 #+BEGIN_SRC emacs-lisp
@@ -570,14 +586,15 @@ so you can just type *<el* then hit TAB
     (diminish 'visual-line-mode)
     (diminish 'page-break-lines-mode)
     (diminish 'rainbow-delimiters-mode)
+    (diminish 'eldoc-mode)
     (diminish 'helm-mode))
 #+END_SRC
 * Dmenu
 #+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :bind
-    ("s-m" . 'dmenu))
+;;  (use-package dmenu
+;;    :ensure t
+;;    :bind
+;;    ("s-m" . 'dmenu))
 #+END_SRC
 * Symon
 #+BEGIN_SRC emacs-lisp
@@ -639,6 +656,7 @@ highlights matching parens when the cursor is just behind one of them
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 * helm
+completions and narrowing selection.
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :ensure t
@@ -649,25 +667,26 @@ highlights matching parens when the cursor is just behind one of them
     :config
     (defun fisthu/hide-minibuffer ()
       (when (with-helm-buffer helm-echo-input-in-header-line)
-	(let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-	  (overlay-put ov 'window (selected-window))
-	  (overlay-put ov 'face
-		       (let ((bg-color (face-background 'default nil)))
-			 `(:background ,bg-color :foreground ,bg-color)))
-	  (setq-local cursor-type nil))))
+        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+          (overlay-put ov 'window (selected-window))
+          (overlay-put ov 'face
+                       (let ((bg-color (face-background 'default nil)))
+                         `(:background ,bg-color :foreground ,bg-color)))
+          (setq-local cursor-type nil))))
     (add-hook 'helm-minibuffer-set-up-hook 'fisthu/hide-minibuffer)
     (setq helm-autoresize-max-height 0
-	  helm-autoresize-min-height 40
-	  helm-M-x-fuzzy-match t
-	  helm-buffers-fuzzy-matching t
-	  helm-recentf-fuzzy-match t
-	  helm-semantic-fuzzy-match t
-	  helm-imenu-fuzzy-match t
-	  helm-split-window-in-side-p nil
-	  helm-move-to-line-cycle-in-source nil
-	  helm-ff-search-library-in-sexp t
-	  helm-scroll-amount 8
-	  helm-echo-input-in-header-line t)
+          helm-autoresize-min-height 40
+          helm-M-x-fuzzy-match t
+          helm-buffers-fuzzy-matching t
+          helm-recentf-fuzzy-match t
+          helm-semantic-fuzzy-match t
+          helm-imenu-fuzzy-match t
+          helm-split-window-in-side-p nil
+          helm-move-to-line-cycle-in-source nil
+          helm-ff-search-library-in-sexp t
+          helm-scroll-amount 8
+          helm-follow-mode-persistent t
+          helm-echo-input-in-header-line t)
     :init
     (helm-mode 1))
 
@@ -675,4 +694,9 @@ highlights matching parens when the cursor is just behind one of them
   (helm-autoresize-mode 1)
   (define-key helm-find-files-map (kbd "C-b") 'helm-find-files-up-one-level)
   (define-key helm-find-files-map (kbd "C-f") 'helm-execute-persistent-action)
+#+END_SRC
+** helm-ag
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-ag
+    :ensure t)
 #+END_SRC

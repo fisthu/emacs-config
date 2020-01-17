@@ -52,7 +52,7 @@
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(package-selected-packages
    (quote
-    (helm-lsp lsp-java company-lsp lsp-ui lsp-mode exec-path-from-shell helm popup-kill-ring slime-company slime flycheck yasnippet-snippets yasnippet expand-region mark-multiple projectile async linum-relative swiper pretty-mode zerodark-theme symon dmenu diminish spaceline company dashboard rainbow-delimiters hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode org-bullets beacon spacemacs-theme which-key use-package))))
+    (vue-mode helm-ag helm-lsp lsp-java company-lsp lsp-ui lsp-mode exec-path-from-shell helm popup-kill-ring slime-company slime flycheck yasnippet-snippets yasnippet expand-region mark-multiple projectile async linum-relative swiper pretty-mode zerodark-theme symon dmenu diminish spaceline company dashboard rainbow-delimiters hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode org-bullets beacon spacemacs-theme which-key use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

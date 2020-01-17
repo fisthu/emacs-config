@@ -173,6 +173,9 @@
 			    ))
 (electric-pair-mode t)
 
+(when (fboundp 'electric-indent-mode)
+  (electric-indent-mode -1))
+
 (line-number-mode 1)
 (column-number-mode 1)
 
@@ -190,19 +193,19 @@
 ;;(setq ido-everywhere t)
 ''(ido-mode 1)
 
-(use-package ido-vertical-mode
-  :ensure t
-  :init
-  (ido-vertical-mode 1))
-(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+;;(use-package ido-vertical-mode
+;;  :ensure t
+;;  :init
+;;  (ido-vertical-mode 1))
+;;(setq ido-vertical-define-keys 'C-n-and-C-p-only)
 
-(use-package smex
-  :ensure t
-  :init (smex-initialize)
-  :bind
-  ("M-x" . smex))
+;;(use-package smex
+;;  :ensure t
+;;  :init (smex-initialize)
+;;  :bind
+;;  ("M-x" . smex))
 
-(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+;;(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 
 (global-set-key (kbd "C-x b") 'ibuffer)
 
@@ -320,6 +323,7 @@
   :ensure t
   :config
   (when IS-MAC
+    (setq exec-path-from-shell-check-startup-files -1)
     (exec-path-from-shell-initialize)))
 
 (use-package yasnippet
@@ -340,7 +344,7 @@
   (lsp-auto-guess-root nil)
   (lsp-prefer-flymake nil) ; use flycheck instead
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((python-mode c-mode c++-mode java-mode) . lsp))
+  :hook ((java-mode vue-mode) . lsp))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -354,7 +358,7 @@
               ([remap xref-find-references] . lsp-ui-peek-find-references)
               ("C-c u" . lsp-ui-imenu))
   :custom
-  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-enable nil) ;; set to t to activate documentation
   (lsp-ui-doc-header t)
   (lsp-ui-doc-include-signature t)
   (lsp-ui-doc-position 'top)
@@ -414,6 +418,14 @@
   :config
   (add-hook 'java-mode-hook 'lsp))
 
+(use-package vue-mode
+  :ensure t
+  :config
+  (setq mmm-submode-decoration-level 0)
+  (add-hook 'mmm-mode-hook
+            (lambda ()
+              (set-face-background 'mmm-default-submode-face "fafafa"))))
+
 (use-package spaceline
   :ensure t
   :config
@@ -436,12 +448,13 @@
   (diminish 'visual-line-mode)
   (diminish 'page-break-lines-mode)
   (diminish 'rainbow-delimiters-mode)
+  (diminish 'eldoc-mode)
   (diminish 'helm-mode))
 
-(use-package dmenu
-  :ensure t
-  :bind
-  ("s-m" . 'dmenu))
+;;  (use-package dmenu
+;;    :ensure t
+;;    :bind
+;;    ("s-m" . 'dmenu))
 
 (use-package symon
   :ensure t
@@ -494,24 +507,25 @@
   (defun fisthu/hide-minibuffer ()
     (when (with-helm-buffer helm-echo-input-in-header-line)
       (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-	(overlay-put ov 'window (selected-window))
-	(overlay-put ov 'face
-		     (let ((bg-color (face-background 'default nil)))
-		       `(:background ,bg-color :foreground ,bg-color)))
-	(setq-local cursor-type nil))))
+        (overlay-put ov 'window (selected-window))
+        (overlay-put ov 'face
+                     (let ((bg-color (face-background 'default nil)))
+                       `(:background ,bg-color :foreground ,bg-color)))
+        (setq-local cursor-type nil))))
   (add-hook 'helm-minibuffer-set-up-hook 'fisthu/hide-minibuffer)
   (setq helm-autoresize-max-height 0
-	helm-autoresize-min-height 40
-	helm-M-x-fuzzy-match t
-	helm-buffers-fuzzy-matching t
-	helm-recentf-fuzzy-match t
-	helm-semantic-fuzzy-match t
-	helm-imenu-fuzzy-match t
-	helm-split-window-in-side-p nil
-	helm-move-to-line-cycle-in-source nil
-	helm-ff-search-library-in-sexp t
-	helm-scroll-amount 8
-	helm-echo-input-in-header-line t)
+        helm-autoresize-min-height 40
+        helm-M-x-fuzzy-match t
+        helm-buffers-fuzzy-matching t
+        helm-recentf-fuzzy-match t
+        helm-semantic-fuzzy-match t
+        helm-imenu-fuzzy-match t
+        helm-split-window-in-side-p nil
+        helm-move-to-line-cycle-in-source nil
+        helm-ff-search-library-in-sexp t
+        helm-scroll-amount 8
+        helm-follow-mode-persistent t
+        helm-echo-input-in-header-line t)
   :init
   (helm-mode 1))
 
@@ -519,3 +533,6 @@
 (helm-autoresize-mode 1)
 (define-key helm-find-files-map (kbd "C-b") 'helm-find-files-up-one-level)
 (define-key helm-find-files-map (kbd "C-f") 'helm-execute-persistent-action)
+
+(use-package helm-ag
+  :ensure t)
