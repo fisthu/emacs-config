@@ -117,6 +117,14 @@
   :init
   (beacon-mode 1))
 
+(setq org-ellipsis " ")
+(setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
+(setq org-confirm-babel-evaluate nil)
+(setq org-export-with-smart-quotes t)
+(setq org-src-window-setup 'current-window)
+(add-hook 'org-mode-hook 'org-indent-mode)
+
 (use-package org-bullets
   :ensure t
   :config
@@ -125,11 +133,21 @@
 (add-to-list 'org-structure-template-alist
 		  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
 
+(add-hook 'org-mode-hook
+	  '(lambda ()
+	     (visual-line-mode 1)))
+
+(global-set-key (kbd "C-c '") 'org-edit-src-code)
+
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(when window-system (global-hl-line-mode t))
+(when window-system (add-hook 'prog-mode-hook 'hl-line-mode))
 
-(when window-system (global-prettify-symbols-mode t))
+(when window-system
+  (use-package pretty-mode
+    :ensure t
+    :config
+    (global-pretty-mode t)))
 
 (tool-bar-mode -1)
 
@@ -167,10 +185,10 @@
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
-(setq ido-enable-flex-matching nil)
-(setq ido-create-new-buffer 'always)
-(setq ido-everywhere t)
-(ido-mode 1)
+;;(setq ido-enable-flex-matching nil)
+;;(setq ido-create-new-buffer 'always)
+;;(setq ido-everywhere t)
+''(ido-mode 1)
 
 (use-package ido-vertical-mode
   :ensure t
@@ -219,13 +237,13 @@
 
 (use-package rainbow-mode
   :ensure t
-  :init (rainbow-mode 1))
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-mode))
 
 (use-package rainbow-delimiters
   :ensure t
   :init
-  ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ;; enable only on programming mode
-  (rainbow-delimiters-mode 1))
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (use-package switch-window
   :ensure t
@@ -260,7 +278,16 @@
      (buffer-substring
       (point-at-bol)
       (point-at-eol)))))
-(global-set-key (kbd "C-c w l") 'fisthu/copy-whole-line)
+(global-set-key (kbd "C-c l c") 'fisthu/copy-whole-line)
+
+(defun fisthu/copy-word ()
+  (interactive)
+  (save-excursion
+    (forward-char 1)
+    (backward-word)
+    (kill-word 1)
+    (yank)))
+(global-set-key (kbd "C-c w c") 'fisthu/copy-word)
 
 (defun fisthu/kill-inner-word ()
   "Kills the entire word where the current cursor is in. Equivalent to 'ciw' in vim."
@@ -270,6 +297,10 @@
   (kill-word 1))
 (global-set-key (kbd "C-c w k") 'fisthu/kill-inner-word)
 
+(use-package mark-multiple
+  :ensure t
+  :bind ("C-c q" . 'mark-next-like-this))
+
 (use-package hungry-delete
   :ensure t
   :config (global-hungry-delete-mode))
@@ -278,14 +309,49 @@
   :ensure t
   :config
   (dashboard-setup-startup-hook)
+  (setq dashboard-startup-banner "~/.emacs.d/img/dashLogo.png")
   (setq dashboard-items '((recents . 5)
 			  (projects . 5)))
   (setq dashboard-banner-logo-title "Assalamualaikum!"))
 
+(use-package yasnippet
+  :ensure t
+  :config
+  (use-package yasnippet-snippets
+    :ensure t)
+  (yas-reload-all))
+
+(use-package flycheck
+  :ensure t)
+
 (use-package company
   :ensure t
+  :config
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 3))
+
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "C-n") #'company-select-next)
+  (define-key company-active-map (kbd "C-p") #'company-select-previous)
+  (define-key company-active-map (kbd "SPC") #'company-abort))
+
+(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+(add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+(use-package slime
+  :ensure t
+  :config
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+  (setq slime-contribs '(slime-fancy)))
+
+(use-package slime-company
+  :ensure t
   :init
-  (add-hook 'after-init-hook 'global-company-mode))
+  (require 'company)
+  (slime-setup '(slime-fancy slime-company)))
 
 (use-package spaceline
   :ensure t
@@ -301,7 +367,10 @@
   (diminish 'beacon-mode)
   (diminish 'subword-mode)
   (diminish 'rainbow-mode)
-  (diminish 'which-key-mode))
+  (diminish 'which-key-mode)
+  (diminish 'flycheck-mode)
+  (diminish 'yas-minor-mode)
+  (diminish 'helm-mode))
 
 (use-package dmenu
   :ensure t
@@ -312,3 +381,70 @@
   :ensure t
   :bind
   ("s-y" . symon-mode))
+
+(use-package swiper
+  :ensure t
+  :bind ("C-s" . 'swiper))
+
+(show-paren-mode 1)
+
+(use-package linum-relative
+  :ensure t
+  :config
+  (setq linum-relative-current-symbol "")
+  (add-hook 'prog-mode-hook 'linum-relative-mode))
+
+(use-package async
+  :ensure t
+  :init (dired-async-mode 1))
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode 1))
+
+(global-set-key (kbd "<f5>") 'projectile-compile-project)
+
+(use-package expand-region
+  :ensure t
+  :bind ("C-q" . er/expand-region))
+
+(use-package popup-kill-ring
+  :ensure t
+  :bind ("M-y" . popup-kill-ring))
+
+(use-package helm
+  :ensure t
+  :bind
+  ("C-x C-f" . 'helm-find-files)
+  ("C-x C-b" . 'helm-buffers-list)
+  ("M-x" . 'helm-M-x)
+  :config
+  (defun fisthu/hide-minibuffer ()
+    (when (with-helm-buffer helm-echo-input-in-header-line)
+      (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+	(overlay-put ov 'window (selected-window))
+	(overlay-put ov 'face
+		     (let ((bg-color (face-background 'default nil)))
+		       `(:background ,bg-color :foreground ,bg-color)))
+	(setq-local cursor-type nil))))
+  (add-hook 'helm-minibuffer-set-up-hook 'fisthu/hide-minibuffer)
+  (setq helm-autoresize-max-height 0
+	helm-autoresize-min-height 40
+	helm-M-x-fuzzy-match t
+	helm-buffers-fuzzy-matching t
+	helm-recentf-fuzzy-match t
+	helm-semantic-fuzzy-match t
+	helm-imenu-fuzzy-match t
+	helm-split-window-in-side-p nil
+	helm-move-to-line-cycle-in-source nil
+	helm-ff-search-library-in-sexp t
+	helm-scroll-amount 8
+	helm-echo-input-in-header-line t)
+  :init
+  (helm-mode 1))
+
+(require 'helm-config)
+(helm-autoresize-mode 1)
+(define-key helm-find-files-map (kbd "C-b") 'helm-find-files-up-one-level)
+(define-key helm-find-files-map (kbd "C-f") 'helm-execute-persistent-action)
