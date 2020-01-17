@@ -400,10 +400,15 @@
 
 (use-package projectile
   :ensure t
-  :init
-  (projectile-mode 1))
-
-(global-set-key (kbd "<f5>") 'projectile-compile-project)
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (define-key projectile-mode-map [?\s-d] 'projectile-find-dir)
+  (define-key projectile-mode-map [?\s-p] 'projectile-switch-project)
+  (define-key projectile-mode-map [?\s-f] 'projectile-find-file)
+  (define-key projectile-mode-map [?\s-g] 'projectile-grep)
+  (setq projectile-project-search-path '("~/dev/"))
+  (projectile-mode +1))
 
 (use-package expand-region
   :ensure t
