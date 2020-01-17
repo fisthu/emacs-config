@@ -301,6 +301,8 @@
   :ensure t
   :bind ("C-c q" . 'mark-next-like-this))
 
+(global-set-key (kbd "C-c l k") 'kill-whole-line)
+
 (use-package hungry-delete
   :ensure t
   :config (global-hungry-delete-mode))
@@ -314,6 +316,12 @@
 			  (projects . 5)))
   (setq dashboard-banner-logo-title "Assalamualaikum!"))
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when IS-MAC
+    (exec-path-from-shell-initialize)))
+
 (use-package yasnippet
   :ensure t
   :config
@@ -322,7 +330,48 @@
   (yas-reload-all))
 
 (use-package flycheck
-  :ensure t)
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package lsp-mode
+  :ensure t
+  :commands lsp
+  :custom
+  (lsp-auto-guess-root nil)
+  (lsp-prefer-flymake nil) ; use flycheck instead
+  :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+  :hook ((python-mode c-mode c++-mode java-mode) . lsp))
+
+(use-package lsp-ui
+  :after lsp-mode
+  :ensure t
+  :commands lsp-ui-mode
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header (( t (:inherit (font-lock-string-face italic)))))
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references)
+              ("C-c u" . lsp-ui-imenu))
+  :custom
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-code-actions nil)
+  :config
+  ;; use lsp-ui-doc-webkit only on GUI
+  (setq lsp-ui-doc-use-webkit t)
+  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+    (setq mode-line-format nil)))
+
+(use-package helm-lsp
+  :after lsp-mode
+  :ensure t
+  :commands helm-lsp-workspace-symbol)
 
 (use-package company
   :ensure t
@@ -336,6 +385,12 @@
   (define-key company-active-map (kbd "C-n") #'company-select-next)
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
   (define-key company-active-map (kbd "SPC") #'company-abort))
+
+(use-package company-lsp
+  :ensure t
+  :config
+  (setq company-lsp-enable-snippet t)
+  (push 'company-lsp company-backends))
 
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
@@ -352,6 +407,12 @@
   :init
   (require 'company)
   (slime-setup '(slime-fancy slime-company)))
+
+(use-package lsp-java
+  :ensure t
+  :after lsp
+  :config
+  (add-hook 'java-mode-hook 'lsp))
 
 (use-package spaceline
   :ensure t
@@ -370,6 +431,11 @@
   (diminish 'which-key-mode)
   (diminish 'flycheck-mode)
   (diminish 'yas-minor-mode)
+  (diminish 'org-indent-mode)
+  (diminish 'linum-relative-mode)
+  (diminish 'visual-line-mode)
+  (diminish 'page-break-lines-mode)
+  (diminish 'rainbow-delimiters-mode)
   (diminish 'helm-mode))
 
 (use-package dmenu

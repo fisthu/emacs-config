@@ -21,3 +21,6 @@ elpa
 transient
 auto-complete-love
 auto-complete-lua
+.cache
+.lsp-session*
+workspace/
