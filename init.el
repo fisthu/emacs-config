@@ -14,11 +14,6 @@
 
 (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
-
-(defconst IS-MAC (eq system-type 'darwin))
-(when IS-MAC
-  (setq mac-command-modifier 'super)
-  (setq mac-option-modifier 'meta))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; This is all kinds of necessary
@@ -52,7 +47,7 @@
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(package-selected-packages
    (quote
-    (vue-mode helm-ag helm-lsp lsp-java company-lsp lsp-ui lsp-mode exec-path-from-shell helm popup-kill-ring slime-company slime flycheck yasnippet-snippets yasnippet expand-region mark-multiple projectile async linum-relative swiper pretty-mode zerodark-theme symon dmenu diminish spaceline company dashboard rainbow-delimiters hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode org-bullets beacon spacemacs-theme which-key use-package))))
+    (vue-mode web-mode smartparens rvm helm-lsp dap-mode lsp-java lsp-ui hydra idle-highlight js2-mode company-tern tern helm-projectile projectile which-key use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

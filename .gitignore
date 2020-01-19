@@ -24,3 +24,5 @@ auto-complete-lua
 .cache
 .lsp-session*
 workspace/
+.dap-breakpoints
+projectile.cache

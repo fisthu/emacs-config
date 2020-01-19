@@ -1,3 +1,14 @@
+* define command and option macOs
+** define constant
+#+BEGIN_SRC emacs-lisp
+  (defconst IS-MAC (eq system-type 'darwin))
+#+END_SRC
+** set key
+#+BEGIN_SRC emacs-lisp
+  (when IS-MAC
+    (setq mac-command-modifier 'super)
+    (setq mac-option-modifier 'meta))
+#+END_SRC
 * Theme
 ** zerodark
 #+BEGIN_SRC emacs-lisp
@@ -113,10 +124,6 @@
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
 #+END_SRC
-** bind Command-Enter to open shell
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-RET") 'ansi-term)
-#+END_SRC
 * Which-key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -169,6 +176,17 @@ so you can just type *<el* then hit TAB
   (global-set-key (kbd "C-c '") 'org-edit-src-code)
 #+END_SRC
 * Misc
+** improve emacs internal garbage collection
+#+BEGIN_SRC emacs-lisp
+  (defun fisthu/minibuffer-setup-hook ()
+    (setq gc-cons-threshold most-positive-fixnum))
+
+  (defun fisthu/minibuffer-exit-hook ()
+    (setq gc-cons-threshold 800000))
+
+  (add-hook 'minibuffer-setup-hook #'fisthu/minibuffer-setup-hook)
+  (add-hook 'minibuffer-exit-hook #'fisthu/minibuffer-exit-hook)
+#+END_SRC
 ** Shortcut from yes/no to y/n
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -212,6 +230,7 @@ so you can just type *<el* then hit TAB
 ** subword
 #+BEGIN_SRC emacs-lisp
 (global-subword-mode 1)
+(add-hook 'minibuffer-setup-hook 'subword-mode)
 #+END_SRC
 ** disable backup file and auto save
 #+BEGIN_SRC emacs-lisp
@@ -221,16 +240,11 @@ so you can just type *<el* then hit TAB
 ** electric pair
 #+BEGIN_SRC emacs-lisp
   (setq electric-pair-pairs '(
-			      (?\( . ?\))
-			      (?\[ . ?\])
-			      (?\{ . ?\})
-			      ))
+            (?\( . ?\))
+            (?\[ . ?\])
+            (?\{ . ?\})
+            ))
   (electric-pair-mode t)
-#+END_SRC
-** disable electric auto indent
-#+BEGIN_SRC emacs-lisp
-  (when (fboundp 'electric-indent-mode)
-    (electric-indent-mode -1))
 #+END_SRC
 ** show lines and columns on the modeline
 #+BEGIN_SRC emacs-lisp
@@ -250,13 +264,47 @@ so you can just type *<el* then hit TAB
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
 #+END_SRC
+** white space
+#+BEGIN_SRC emacs-lisp
+  (setq tab-width 2)
+  ;;(setq-default indent-tabs-mode nil)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+   ;; ws-butler cleans up whitespace only on the lines you've edited,
+   ;; keeping messy colleagues happy ;-) Important that it doesn't clean
+   ;; the whitespace on currrent line, otherwise, eclim leaves messy
+   ;; code behind.
+   (use-package ws-butler
+   :ensure t
+   :init
+   (setq ws-butler-keep-whitespace-before-point nil)
+   :config
+   (ws-butler-global-mode))
+
+   (defun fisthu/indent-and-fix-whitespace()
+     (interactive)
+     (delete-trailing-whitespace)
+     (untabify (point-min) (point-max))
+     (indent-region (point-min) (point-max)))
+  (global-set-key (kbd "C-M-\\") 'fisthu/indent-and-fix-whitespace)
+#+END_SRC
+** convenient shortcuts
+#+BEGIN_SRC emacs-lisp
+  (global-set-key [ ( super backspace) ] 'backward-kill-word)
+
+  ;; newline and indent (like other editors)
+  (global-set-key "\C-m" 'newline-and-indent)
+
+  ;; wrap long lines visually, not actually.
+  (global-visual-line-mode 1)
+#+END_SRC
 * IDO
 ** enable ido mode
 #+BEGIN_SRC emacs-lisp
   ;;(setq ido-enable-flex-matching nil)
   ;;(setq ido-create-new-buffer 'always)
   ;;(setq ido-everywhere t)
-  ''(ido-mode 1)
+  ;;(ido-mode 1)
 #+END_SRC
 ** ido-vertical
 #+BEGIN_SRC emacs-lisp
@@ -265,6 +313,14 @@ so you can just type *<el* then hit TAB
   ;;  :init
   ;;  (ido-vertical-mode 1))
   ;;(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+  (use-package ido-vertical-mode
+    :ensure t
+    :init
+    (setq ido-vertical-indicator ">>")
+    (setq ido-vertical-show-count nil)
+    (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+    :config
+    (ido-vertical-mode 1))
 #+END_SRC
 ** smex (ido like for M-x)
 #+BEGIN_SRC emacs-lisp
@@ -348,7 +404,7 @@ so you can just type *<el* then hit TAB
     (setq switch-window-threshold 2)
     (setq switch-window-shortcut-style 'qwerty)
     (setq switch-window-qwerty-shortcuts
-	  '("a" "s" "d" "f" "h" "j" "k" "l"))
+    '("a" "s" "d" "f" "h" "j" "k" "l"))
     :bind
     ([remap other-window] . switch-window))
 #+END_SRC
@@ -376,8 +432,8 @@ so you can just type *<el* then hit TAB
     (save-excursion
       (kill-new
        (buffer-substring
-	(point-at-bol)
-	(point-at-eol)))))
+  (point-at-bol)
+  (point-at-eol)))))
   (global-set-key (kbd "C-c l c") 'fisthu/copy-whole-line)
 #+END_SRC
 ** copy whole word
@@ -425,7 +481,7 @@ so you can just type *<el* then hit TAB
     (dashboard-setup-startup-hook)
     (setq dashboard-startup-banner "~/.emacs.d/img/dashLogo.png")
     (setq dashboard-items '((recents . 5)
-			    (projects . 5)))
+          (projects . 5)))
     (setq dashboard-banner-logo-title "Assalamualaikum!"))
 #+END_SRC
 * exec-path-from-shell
@@ -442,27 +498,54 @@ so you can just type *<el* then hit TAB
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
+    :init
+    (setq yas/root-directory '("~/.emacs.d/snippets"))
     :config
     (use-package yasnippet-snippets
       :ensure t)
-    (yas-reload-all))
+    (yas-reload-all)
+    (yas-global-mode 1))
 #+END_SRC
 ** flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
-    :init (global-flycheck-mode))
+    :init
+    (add-to-list 'display-buffer-alist
+                 `(,(rx bos "*Flycheck errors" eos)
+                   (display-buffer-reuse-window
+                    display-buffer-in-side-window)
+                   (side . bottom)
+                   (reusable-frames . visible)
+                   (window-height . 0.15))))
 #+END_SRC
 ** lsp-mode
 #+BEGIN_SRC emacs-lisp
+  ;; (use-package lsp-mode
+  ;;   :ensure t
+  ;;   :commands lsp
+  ;;   :config
+  ;;   (setq lsp-auto-guess-root nil
+  ;;         lsp-prefer-flymake nil)
+  ;;   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+  ;;   :hook ((ruby-mode) . lsp))
+
   (use-package lsp-mode
     :ensure t
-    :commands lsp
-    :custom
-    (lsp-auto-guess-root nil)
-    (lsp-prefer-flymake nil) ; use flycheck instead
-    :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-    :hook ((java-mode vue-mode) . lsp))
+    :commands (lsp lsp-deferred)
+    :bind
+    (("ESC g i" . 'lsp-find-implementation)
+     ("M-RET" . 'lsp-execute-code-action)
+     (:map lsp-mode-map ("C-c C-f" . 'lsp-format-buffer)))
+    :config
+    (setq lsp-inhibit-message t
+          lsp-eldoc-render-all nil
+          lsp-enable-file-watchers nil
+          lsp-highlight-symbol-at-point nil
+          lsp-prefer-flymake nil
+          lsp-auto-guess-root nil)
+    :hook
+    ((ruby-mode web-mode) . 'lsp))
 #+END_SRC
 ** lsp-ui
 #+BEGIN_SRC emacs-lisp
@@ -500,11 +583,12 @@ so you can just type *<el* then hit TAB
     :commands helm-lsp-workspace-symbol)
 #+END_SRC
 ** company
+autocompletion
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
     :config
-    (setq company-idle-delay 0)
+    (setq company-idle-delay 0.1)
     (setq company-minimum-prefix-length 3))
 
   (with-eval-after-load 'company
@@ -514,6 +598,12 @@ so you can just type *<el* then hit TAB
     (define-key company-active-map (kbd "C-p") #'company-select-previous)
     (define-key company-active-map (kbd "SPC") #'company-abort))
 #+END_SRC
+** company-emoji
+#+BEGIN_SRC emacs-lisp
+  (use-package company-emoji
+    :ensure t)
+  (add-to-list 'company-backends 'company-emoji)
+#+END_SRC
 ** company-lsp
 #+BEGIN_SRC emacs-lisp
   (use-package company-lsp
@@ -522,8 +612,7 @@ so you can just type *<el* then hit TAB
     (setq company-lsp-enable-snippet t)
     (push 'company-lsp company-backends))
 #+END_SRC
-** specific languages
-*** emacs-lisp
+** emacs-lisp
 #+BEGIN_SRC emacs-lisp
   (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
@@ -541,23 +630,150 @@ so you can just type *<el* then hit TAB
     (require 'company)
     (slime-setup '(slime-fancy slime-company)))
 #+END_SRC
-** lsp-java
+** java
 #+BEGIN_SRC emacs-lisp
+  (defun fisthu/insert-serial-version-uuid()
+    (interactive)
+    (insert "private static final long serialVersionUID = 1L;"))
+
+  (defun fisthu/default-code-style-hook()
+    (setq c-basic-offset 2
+          c-label-offset 0
+          tab-width 2
+          indent-tabs-mode nil
+          require-final-newline nil))
+  (add-hook 'java-mode-hook 'fisthu/default-code-style-hook)
+
+  (use-package idle-highlight  :ensure t)
+
+  (defun nyong-java-mode-hook()
+    (auto-fill-mode)
+    (flycheck-mode)
+    (idle-highlight)
+    (subword-mode)
+    (yas-minor-mode)
+    (set-fringe-style '(8 . 0))
+    (define-key c-mode-base-map (kbd "C-M-j") 'fisthu/insert-serial-version-uuid)
+    (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break))
+
+  ;; fix indent for anonymous classes
+  (c-set-offset 'substatement-open 0)
+  (if (assoc 'inexpr-class c-offsets-alist)
+      (c-set-offset 'inexpr-class 0))
+
+  ;; indent argument on the next lineas indented body
+  (c-set-offset 'arglist-intro '++)
+  (add-hook 'java-mode-hook 'nyong-java-mode-hook)
+
+  (use-package hydra :ensure t)
+
   (use-package lsp-java
     :ensure t
     :after lsp
+    :init
+    (setq lsp-java-vmargs
+          (list
+           "-noverify"
+           "-Xmx1G"
+           "-XX:+UseG1GC"
+           "-XX:+UseStringDeduplication")
+          ;; dont organise imports on save
+          lsp-java-save-actions-organize-imports nil
+          lsp-java-java-path "/usr/bin/java")
     :config
     (add-hook 'java-mode-hook 'lsp))
+
+  (use-package dap-mode
+    :ensure t
+    :after lsp-mode
+    :config
+    (dap-mode t)
+    (dap-ui-mode t)
+    (dap-tooltip-mode 1)
+    (tooltip-mode 1)
+    (dap-register-debug-template
+     "localhost:5005"
+     (list :type "java"
+           :request "attach"
+           :hostName "localhost"
+           :port 5005)))
+
+  (use-package dap-java
+    :ensure nil
+    :after (lsp-java)
+    ;; The :bind here makes use-package fail to lead the dap-java block!
+    ;; :bind
+    ;; (("C-c R" . dap-java-run-test-class)
+    ;;  ("C-c d" . dap-java-debug-test-method)
+    ;;  ("C-c r" . dap-java-run-test-method)
+    ;;  )
+    :config
+    (global-set-key (kbd "<f7>") 'dap-step-in)
+    (global-set-key (kbd "<f8>") 'dap-next)
+    (global-set-key (kbd "<f9>") 'dap-continue))
+#+END_SRC
+** sql
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'sql-interactive-mode-hook
+            (lambda ()
+               (company-mode)))
+#+END_SRC
+** javascript mode
+#+BEGIN_SRC emacs-lisp
+  (setq js2-basic-offset 2
+        js2-indent-on-enter-key t
+        js2-enter-indents-newline t
+        js-indent-level 2)
+
+  (use-package tern
+    :ensure t
+    :init
+    (setq tern-explicit-port 35129
+          tern-command '("~/.nvm/versions/node/v12.13.0/bin/tern"))
+    :config
+    (use-package company-tern
+      :ensure t
+      :config
+      (add-to-list 'company-backends 'company-tern)))
+
+  (use-package js2-mode
+    :ensure t
+    :init
+    (add-hook 'js2-mode-hook 'tern-mode)
+    (add-hook 'js2-mode-hook #'lsp)
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+#+END_SRC
+** rvm
+#+BEGIN_SRC emacs-lisp
+  (use-package rvm
+    :ensure t
+    :config
+    (add-hook 'ruby-mode-hook 'rvm-activate-corresponding-ruby))
+#+END_SRC
+** web-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
+
+  (defun my-web-mode-hook ()
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-code-indent-offset 2))
+  (add-hook 'web-mode-hook 'my-web-mode-hook)
 #+END_SRC
 ** vue-mode
 #+BEGIN_SRC emacs-lisp
   (use-package vue-mode
     :ensure t
+    :mode "\\.vue\\'"
     :config
-    (setq mmm-submode-decoration-level 0)
-    (add-hook 'mmm-mode-hook
-              (lambda ()
-                (set-face-background 'mmm-default-submode-face "fafafa"))))
+    (add-hook 'vue-mode-hook #'lsp)
+    (add-to-list 'vue-mode-hook 'web-mode))
+
+  (add-hook 'vue-mode-hook
+            (lambda ()
+              (smartparens-mode t)))
 #+END_SRC
 * Modeline
 ** spaceline
@@ -569,32 +785,12 @@ so you can just type *<el* then hit TAB
     (setq powerline-default-separator (quote arrow))
     (spaceline-spacemacs-theme))
 #+END_SRC
-** diminish
+* treemacs
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish
+  (use-package treemacs
     :ensure t
     :init
-    (diminish 'hungry-delete-mode)
-    (diminish 'beacon-mode)
-    (diminish 'subword-mode)
-    (diminish 'rainbow-mode)
-    (diminish 'which-key-mode)
-    (diminish 'flycheck-mode)
-    (diminish 'yas-minor-mode)
-    (diminish 'org-indent-mode)
-    (diminish 'linum-relative-mode)
-    (diminish 'visual-line-mode)
-    (diminish 'page-break-lines-mode)
-    (diminish 'rainbow-delimiters-mode)
-    (diminish 'eldoc-mode)
-    (diminish 'helm-mode))
-#+END_SRC
-* Dmenu
-#+BEGIN_SRC emacs-lisp
-;;  (use-package dmenu
-;;    :ensure t
-;;    :bind
-;;    ("s-m" . 'dmenu))
+    (add-hook 'treemacs-mode-hook (lambda () (treemacs-resize-icons 15))))
 #+END_SRC
 * Symon
 #+BEGIN_SRC emacs-lisp
@@ -609,10 +805,25 @@ so you can just type *<el* then hit TAB
     :ensure t
     :bind ("C-s" . 'swiper))
 #+END_SRC
-* Show parens
+* parens
 highlights matching parens when the cursor is just behind one of them
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
+  (setq show-paren-style 'expression)
+
+  (use-package paren :ensure t)
+  (set-face-background 'show-paren-match (face-background 'default))
+  (set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+#+END_SRC
+** smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :init
+    (require 'smartparens-config)
+    :config
+    (smartparens-global-mode t))
+  ;;(add-hook 'js-mode-hook #'smartparens-mode)
 #+END_SRC
 * Line numbers relative
 #+BEGIN_SRC emacs-lisp
@@ -633,21 +844,62 @@ highlights matching parens when the cursor is just behind one of them
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
+    :bind
+    (("C-c p f" . 'projectile-find-file))
+    :init
+    (setq projectile-enable-caching t
+          projectile-globally-ignored-file-suffixes
+          '(
+            "blob"
+            "class"
+            "classpath"
+            "gz"
+            "iml"
+            "ipr"
+            "jar"
+            "pyc"
+            "tkj"
+            "war"
+            "xd"
+            "zip")
+          projectile-globally-ignored-files '("TAGS" "*~")
+          projectile-tags-command "/usr/local/bin/ctags -Re -f \"%s\" %s"
+          projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
     :config
-    (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
     (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
     (define-key projectile-mode-map [?\s-d] 'projectile-find-dir)
     (define-key projectile-mode-map [?\s-p] 'projectile-switch-project)
     (define-key projectile-mode-map [?\s-f] 'projectile-find-file)
     (define-key projectile-mode-map [?\s-g] 'projectile-grep)
     (setq projectile-project-search-path '("~/dev/"))
-    (projectile-mode +1))
+    (projectile-global-mode)
+    (setq projectile-globally-ignored-directories
+          (append (list
+                   ".pytest_cache"
+                   "__pycache__"
+                   "build"
+                   "elpa"
+                   "node_modules"
+                   "output"
+                   "reveal.js"
+                   "semanticdb"
+                   "target"
+                   "venv")
+                  projectile-globally-ignored-directories))
+    )
+
+  (use-package helm-projectile
+    :ensure t
+    :init
+    (setq helm-ag-insert-at-point 'symbol)
+    :bind
+    ("C-'" . 'helm-projectile-ag))
 #+END_SRC
 * expand region
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :ensure t
-    :bind ("C-q" . er/expand-region))
+    :bind ("C-q" . 'er/expand-region))
 #+END_SRC
 * kill ring
 #+BEGIN_SRC emacs-lisp
@@ -660,43 +912,74 @@ completions and narrowing selection.
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :ensure t
+    :init
+    (defun fisthu/list-buffers()
+      (interactive)
+      (let ((helm-full-frame t))
+        (helm-mini)))
     :bind
     ("C-x C-f" . 'helm-find-files)
-    ("C-x C-b" . 'helm-buffers-list)
-    ("M-x" . 'helm-M-x)
-    :config
-    (defun fisthu/hide-minibuffer ()
-      (when (with-helm-buffer helm-echo-input-in-header-line)
-        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-          (overlay-put ov 'window (selected-window))
-          (overlay-put ov 'face
-                       (let ((bg-color (face-background 'default nil)))
-                         `(:background ,bg-color :foreground ,bg-color)))
-          (setq-local cursor-type nil))))
-    (add-hook 'helm-minibuffer-set-up-hook 'fisthu/hide-minibuffer)
-    (setq helm-autoresize-max-height 0
-          helm-autoresize-min-height 40
-          helm-M-x-fuzzy-match t
-          helm-buffers-fuzzy-matching t
-          helm-recentf-fuzzy-match t
-          helm-semantic-fuzzy-match t
-          helm-imenu-fuzzy-match t
-          helm-split-window-in-side-p nil
-          helm-move-to-line-cycle-in-source nil
-          helm-ff-search-library-in-sexp t
-          helm-scroll-amount 8
-          helm-follow-mode-persistent t
-          helm-echo-input-in-header-line t)
-    :init
-    (helm-mode 1))
+    ("C-x C-b" . 'fisthu/list-buffers)
+    ("M-x" . 'helm-M-x))
 
-  (require 'helm-config)
-  (helm-autoresize-mode 1)
-  (define-key helm-find-files-map (kbd "C-b") 'helm-find-files-up-one-level)
-  (define-key helm-find-files-map (kbd "C-f") 'helm-execute-persistent-action)
+  ;; auto scroll the compilation window
+  (setq compilation-scroll-output t)
+
+  ;; scroll up and down while keeping the cursor
+  (defun help/scroll-up-one-line ()
+    (interactive)
+    (scroll-down 1))
+  (defun help/scroll-down-one-line ()
+    (interactive)
+    (scroll-up 1))
+  (global-set-key (kbd "M-p") 'help/scroll-down-one-line)
+  (global-set-key (kbd "M-n") 'help/scroll-up-one-line)
 #+END_SRC
 ** helm-ag
 #+BEGIN_SRC emacs-lisp
   (use-package helm-ag
     :ensure t)
+#+END_SRC
+* clipboard
+#+BEGIN_SRC emacs-lisp
+  (use-package xclip
+    :ensure t
+    :config
+    (xclip-mode 1))
+#+END_SRC
+* diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'hungry-delete-mode)
+    (diminish 'beacon-mode)
+    (diminish 'subword-mode)
+    (diminish 'rainbow-mode)
+    (diminish 'which-key-mode)
+    (diminish 'flycheck-mode)
+    (diminish 'yas-minor-mode)
+    (diminish 'org-indent-mode)
+    (diminish 'linum-relative-mode)
+    (diminish 'visual-line-mode)
+    (diminish 'page-break-lines-mode)
+    (diminish 'rainbow-delimiters-mode)
+    (diminish 'eldoc-mode)
+    (diminish 'abbrev-mode)
+    (diminish 'auto-fill-mode)
+    (diminish 'company-mode)
+    (diminish 'eldoc-mode)
+    (diminish 'flycheck-mode)
+    (diminish 'git-gutter+-mode)
+    (diminish 'gtags-mode)
+    (diminish 'java-mode)
+    (diminish 'projectile-mode)
+    (diminish 'visual-line-mode)
+    (diminish 'winner-mode)
+    (diminish 'ws-butler-global-mode)
+    (diminish 'ws-butler-mode)
+    (diminish 'yas-minor-mode)
+    (diminish 'org-indent-mode)
+    (diminish 'smartparens-mode)
+    (diminish 'helm-mode))
 #+END_SRC
