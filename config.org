@@ -116,6 +116,11 @@
      `(org-block-end-line ((,class (:background ,background-blue :foreground ,blue
 						:bold t :height 1.0))))))
 #+END_SRC
+** titlebar transparent
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark))
+#+END_SRC
 * Terminal
 ** Setting default shell to zsh
 #+BEGIN_SRC emacs-lisp
@@ -178,14 +183,14 @@ so you can just type *<el* then hit TAB
 * Misc
 ** improve emacs internal garbage collection
 #+BEGIN_SRC emacs-lisp
-  (defun fisthu/minibuffer-setup-hook ()
-    (setq gc-cons-threshold most-positive-fixnum))
+  ;;(defun fisthu/minibuffer-setup-hook ()
+  ;;  (setq gc-cons-threshold most-positive-fixnum))
 
-  (defun fisthu/minibuffer-exit-hook ()
-    (setq gc-cons-threshold 800000))
+  ;;(defun fisthu/minibuffer-exit-hook ()
+  ;;  (setq gc-cons-threshold 800000))
 
-  (add-hook 'minibuffer-setup-hook #'fisthu/minibuffer-setup-hook)
-  (add-hook 'minibuffer-exit-hook #'fisthu/minibuffer-exit-hook)
+  ;;(add-hook 'minibuffer-setup-hook #'fisthu/minibuffer-setup-hook)
+  ;;(add-hook 'minibuffer-exit-hook #'fisthu/minibuffer-exit-hook)
 #+END_SRC
 ** Shortcut from yes/no to y/n
 #+BEGIN_SRC emacs-lisp
@@ -768,12 +773,9 @@ autocompletion
     :ensure t
     :mode "\\.vue\\'"
     :config
-    (add-hook 'vue-mode-hook #'lsp)
+    (add-to-list 'vue-mode-hook 'lsp)
+    (add-to-list 'vue-mode-hook 'smartparens-mode)
     (add-to-list 'vue-mode-hook 'web-mode))
-
-  (add-hook 'vue-mode-hook
-            (lambda ()
-              (smartparens-mode t)))
 #+END_SRC
 * Modeline
 ** spaceline

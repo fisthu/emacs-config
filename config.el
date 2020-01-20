@@ -106,6 +106,9 @@
    `(org-block-end-line ((,class (:background ,background-blue :foreground ,blue
 					      :bold t :height 1.0))))))
 
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+
 (defvar my-term-shell "/bin/zsh")
 (defadvice ansi-term (before force-bash)
   (interactive (list my-term-shell)))
@@ -143,14 +146,14 @@
 
 (global-set-key (kbd "C-c '") 'org-edit-src-code)
 
-(defun fisthu/minibuffer-setup-hook ()
-  (setq gc-cons-threshold most-positive-fixnum))
+;;(defun fisthu/minibuffer-setup-hook ()
+;;  (setq gc-cons-threshold most-positive-fixnum))
 
-(defun fisthu/minibuffer-exit-hook ()
-  (setq gc-cons-threshold 800000))
+;;(defun fisthu/minibuffer-exit-hook ()
+;;  (setq gc-cons-threshold 800000))
 
-(add-hook 'minibuffer-setup-hook #'fisthu/minibuffer-setup-hook)
-(add-hook 'minibuffer-exit-hook #'fisthu/minibuffer-exit-hook)
+;;(add-hook 'minibuffer-setup-hook #'fisthu/minibuffer-setup-hook)
+;;(add-hook 'minibuffer-exit-hook #'fisthu/minibuffer-exit-hook)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -617,12 +620,9 @@
   :ensure t
   :mode "\\.vue\\'"
   :config
-  (add-hook 'vue-mode-hook #'lsp)
+  (add-to-list 'vue-mode-hook 'lsp)
+  (add-to-list 'vue-mode-hook 'smartparens-mode)
   (add-to-list 'vue-mode-hook 'web-mode))
-
-(add-hook 'vue-mode-hook
-          (lambda ()
-            (smartparens-mode t)))
 
 (use-package spaceline
   :ensure t
