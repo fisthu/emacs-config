@@ -26,3 +26,4 @@ auto-complete-lua
 workspace/
 .dap-breakpoints
 projectile.cache
+eclipse.jdt.ls
